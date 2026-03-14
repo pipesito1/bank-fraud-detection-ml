@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bank Fraud Detection</title>
+
+<style>
+
+body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    padding: 30px;
+}
+
+h1 {
+    color: #38bdf8;
+}
+
+/* ===== MAIN CONTAINER ===== */
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+}
+
+
+/* ===== TOP ROW ===== */
+
+.top-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    justify-content: center;
+    margin: 30px auto;
+    max-width: 400px;
+}
+
+.top-row div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+/* ===== GRID ===== */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px 25px;
+    margin-top: 20px;
+}
+
+
+/* ===== INPUT BLOCK ===== */
+
+.input-box {
+    display: grid;
+    grid-template-columns: 45px 1fr;
+    align-items: center;
+    gap: 6px;
+}
+
+
+/* ===== INPUT ===== */
+
+input {
+    width: 100%;
+    padding: 7px;
+    border-radius: 5px;
+    border: none;
+}
+
+label {
+    text-align: right;
+    font-weight: 500;
+}
+
+/* ===== BUTTON ===== */
+
+button {
+    background: #38bdf8;
+    border: none;
+    padding: 12px 35px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 30px;
+}
+
+button:hover {
+    background: #0284c7;
+}
+
+
+/* ===== RESULT ===== */
+
+.result-box {
+    margin-top: 25px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.fraud {
+    color: #ff4d4d;
+}
+
+.normal {
+    color: #00ff99;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<h1>💳 Bank Fraud Detection</h1>
+
+<p>Enter transaction data</p>
+
+<div class="container">
+
+    <!-- Time + Amount -->
+    <div class="top-row" id="top-form"></div>
+
+    <!-- V1 - V28 -->
+    <div class="grid" id="form"></div>
+
+</div>
+
+
+<button onclick="sendData()">Predict</button>
+
+<div id="result" class="result-box"></div>
+
+
+<script>
+
+const form = document.getElementById("form");
+const topForm = document.getElementById("top-form");
+const resultDiv = document.getElementById("result");
+
+
+// ================= CREATE INPUTS =================
+
+function createInputs() {
+
+    // Time & Amount + Buttons
+    topForm.innerHTML = `
+
+        <div class="input-box">
+            <label>Time:</label>
+            <input id="Time" type="number" step="any">
+        </div>
+
+        <div class="input-box">
+            <label>Amount:</label>
+            <input id="Amount" type="number" step="any">
+        </div>
+
+        <button onclick="fillExample()" type="button">
+            Fill Example
+        </button>
+
+        <button onclick="sendData()" type="button">
+            Predict
+        </button>
+
+        <div id="loader" style="display:none;">
+            ⏳ Loading...
+        </div>
+    `;
+
+
+    // V1 - V28
+    let html = "";
+
+    for (let i = 1; i <= 28; i++) {
+
+        html += `
+        <div class="input-box">
+            <label>V${i}:</label>
+            <input id="V${i}" type="number" step="any">
+        </div>
+        `;
+    }
+
+    form.innerHTML = html;
+}
+
+createInputs();
+
+
+// ================= FILL EXAMPLE =================
+
+function fillExample() {
+
+    document.getElementById("Time").value = 12345;
+    document.getElementById("Amount").value = 149.99;
+
+    for (let i = 1; i <= 28; i++) {
+        document.getElementById(`V${i}`).value =
+            (Math.random() * 4 - 2).toFixed(4);
+    }
+
+    resultDiv.innerHTML = "";
+}
+
+
+// ================= VALIDATION =================
+
+function validateInputs() {
+
+    if (
+        document.getElementById("Time").value === "" ||
+        document.getElementById("Amount").value === ""
+    ) {
+        alert("⚠️ Please fill Time and Amount");
+        return false;
+    }
+
+    for (let i = 1; i <= 28; i++) {
+
+        if (document.getElementById(`V${i}`).value === "") {
+            alert(`⚠️ Please fill V${i}`);
+            return false;
+        }
+
+    }
+
+    return true;
+}
+
+
+// ================= SEND DATA =================
+
+async function sendData() {
+
+    const resultDiv = document.getElementById("result");
+
+    resultDiv.innerHTML = "⏳ Predicting...";
+    resultDiv.className = "result-box";
+
+    let data = {};
+
+    try {
+
+        // Time & Amount
+        data["Time"] = Number(document.getElementById("Time").value);
+        data["Amount"] = Number(document.getElementById("Amount").value);
+
+        // V1 - V28
+        for (let i = 1; i <= 28; i++) {
+
+            const val = document.getElementById(`V${i}`).value;
+
+            if (val === "") {
+                throw new Error(`V${i} is empty`);
+            }
+
+            data[`V${i}`] = Number(val);
+        }
+
+        // Request
+        const response = await fetch("http://127.0.0.1:5000/predict", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(data)
+        });
+
+
+        if (!response.ok) {
+
+            const txt = await response.text();
+
+            throw new Error(
+                `Server error: ${response.status} - ${txt}`
+            );
+        }
+
+
+        const result = await response.json();
+
+
+        // Show result
+        if (result.prediction === "FRAUD") {
+
+            resultDiv.innerHTML = `
+                ⚠️ FRAUD DETECTED <br>
+                Probability: ${result.probability}
+            `;
+
+            resultDiv.className = "result-box fraud";
+
+        } else {
+
+            resultDiv.innerHTML = `
+                ✅ NORMAL PAYMENT <br>
+                Probability: ${result.probability}
+            `;
+
+            resultDiv.className = "result-box normal";
+        }
+
+
+    } catch (error) {
+
+        console.error("ERROR:", error);
+
+        resultDiv.innerHTML = `
+            ❌ Error <br>
+            ${error.message}
+        `;
+
+        resultDiv.className = "result-box";
+    }
+}
+
+</script>
+
+</body>
+</html>
