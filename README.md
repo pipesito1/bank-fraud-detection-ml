@@ -154,7 +154,7 @@ Features of the web demo:
 
 # 🏗 Project Structure
 
-<img src="assets/Estructure_project.png" width="700">
+<img src="assets/estructure_project.png" width="700">
 
 Example repository structure:
 
