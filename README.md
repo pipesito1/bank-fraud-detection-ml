@@ -156,7 +156,36 @@ Features of the web demo:
 
 <img src="assets/estructure_project.png" width="700">
 
-Example repository structure:
+# 🚀 Future Improvements
+
+Possible improvements for this project include:
+
+- Implementing advanced models such as **XGBoost or Gradient Boosting**
+- Handling class imbalance using **SMOTE**
+- Deploying the application as a **public web API**
+- Integrating with **real-time transaction streaming systems**
+- Deploying the project on cloud platforms
+
+---
+
+# 👨‍💻 Author
+
+**Felipe Sepúlveda**
+
+Data Scientist | Data data Engineer | Machine Learning
+
+Email:
+jhesuafelipe24@gmail.com
+
+GitHub:  
+https://github.com/pipesito1
+
+LinkedIn:  
+https://www.linkedin.com/in/felipe-sepulveda-21684a115/
+
+---
+
+⭐ This project is part of my **Data Science and Machine Learning portfolio**, showcasing the application of machine learning techniques for financial fraud detection.
 
 
 
