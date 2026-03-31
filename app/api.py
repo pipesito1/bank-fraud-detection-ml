@@ -7,13 +7,20 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
 import pandas as pd
+import os
 
 # =============================
 # LOAD MODEL
 # =============================
 
-model = joblib.load("fraud_model.pkl")
-scaler = joblib.load("scaler.pkl")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+model_path = os.path.join(BASE_DIR, "..", "models", "fraud_model.pkl")
+scaler_path = os.path.join(BASE_DIR, "..", "models", "scaler.pkl")
+
+model = joblib.load(model_path)
+scaler = joblib.load(scaler_path)
+
 
 print("✅ Model loaded")
 
@@ -78,10 +85,8 @@ def predict():
 # =============================
 
 if __name__ == "__main__":
-
     app.run(
-        debug=True,
-        host="127.0.0.1",
-        port=5000
+        debug=False,
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000))
     )
-
